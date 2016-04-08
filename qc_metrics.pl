@@ -13,7 +13,7 @@ my @gms_header = ( 'subject.name', 'model.name', 'date_completed','model.last_su
 GetOptions(
     "file:s" => \$file, 
     "out:s" => \$out,
-    "field:s" => \$field,
+    "fields:s" => \$field,
 ) or die ("Error in command arguments");
 
 if ($field){
@@ -28,25 +28,24 @@ if ($field){
 open(FILE, $file);
 open(WRITE, '>', $out);
 
-my $in_start = 0;
+my $first = 1;
 
 print WRITE (join($DELIM, @header)."\n");
 
 while(<FILE>){
-    
+	# Issue #1 starts here
     chomp;
     my $info = $_;
     $info =~ s/^\s+//;
 
     if ($info =~ /^---/){
-        if ($in_start){
-            print_row(\%fields);
-            %fields = ();
-            $in_start = 1;
-        }else{
-            $in_start = 1;
-        }
-    }elsif($in_start){
+    	if ($first){
+    		$first = 0;
+    		next;
+    	}
+        print_row(\%fields);
+        %fields = ();
+    }else{
         my ($k, $v) = split(': ', $info);
         $v =~ s/(^\s+)|([\s:]+$)//g;
         $fields{$k} = $v;
@@ -55,6 +54,8 @@ while(<FILE>){
 
 close FILE;
 close WRITE;
+
+exit;
 
 my $gms_succ = 'gms_succeeded_'.$out;
 my $gms_fail = 'gms_fail_'.$out;
