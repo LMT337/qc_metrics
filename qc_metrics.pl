@@ -55,8 +55,6 @@ while(<FILE>){
 close FILE;
 close WRITE;
 
-exit;
-
 my $gms_succ = 'gms_succeeded_'.$out;
 my $gms_fail = 'gms_fail_'.$out;
 my $gms_cmds = 'gms_cmds_'.$out;
